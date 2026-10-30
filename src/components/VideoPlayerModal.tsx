@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, ExternalLink, RefreshCw, Server, Film, AlertCircle, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert } from "lucide-react";
+import { X, ExternalLink, RefreshCw, Server, Film, AlertCircle, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { PlayTarget } from "@/types";
 
 interface VideoPlayerModalProps {
@@ -21,11 +21,10 @@ export default function VideoPlayerModal({
 }: VideoPlayerModalProps) {
   const [selectedServer, setSelectedServer] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
-  const [antiPopup, setAntiPopup] = useState<boolean>(true);
 
   useEffect(() => {
     setLoading(true);
-  }, [playTarget, selectedServer, antiPopup]);
+  }, [playTarget, selectedServer]);
 
   if (!playTarget) return null;
 
@@ -45,8 +44,8 @@ export default function VideoPlayerModal({
       if (serverIndex === 1) {
         // VidLink (Super fast, clean player with subtitle support)
         return isSeries
-          ? `https://vidlink.pro/tv/${id}/${season}/${episode}?primaryColor=ef4444&autoplay=false`
-          : `https://vidlink.pro/movie/${id}?primaryColor=ef4444&autoplay=false`;
+          ? `https://vidlink.pro/tv/${id}/${season}/${episode}?primaryColor=ef4444`
+          : `https://vidlink.pro/movie/${id}?primaryColor=ef4444`;
       }
       if (serverIndex === 2) {
         // 2Embed
@@ -124,34 +123,8 @@ export default function VideoPlayerModal({
           ))}
         </div>
 
-        {/* Action Controls & Anti-Popups Toggle */}
+        {/* Action Controls */}
         <div className="flex items-center gap-2">
-          
-          {/* Anti-Popup Sandbox Shield Button */}
-          <button
-            onClick={() => setAntiPopup(!antiPopup)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-              antiPopup
-                ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25"
-                : "bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25"
-            }`}
-            title="Klik untuk mengaktifkan / menonaktifkan blokir popup iklan"
-          >
-            {antiPopup ? (
-              <>
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="hidden sm:inline">Anti-Iklan: Aktif</span>
-                <span className="sm:hidden">Anti-Iklan</span>
-              </>
-            ) : (
-              <>
-                <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-                <span className="hidden sm:inline">Anti-Iklan: Mati</span>
-                <span className="sm:hidden">Iklan Aktif</span>
-              </>
-            )}
-          </button>
-
           {hasEpisodes && onPrevEpisode && (
             <button
               onClick={onPrevEpisode}
@@ -207,17 +180,13 @@ export default function VideoPlayerModal({
               </div>
             )}
 
+            {/* Clean Standard Iframe without restrictive sandbox */}
             <iframe
-              key={`${currentStreamUrl}-${selectedServer}-${antiPopup}`}
+              key={`${currentStreamUrl}-${selectedServer}`}
               src={currentStreamUrl}
               className="w-full flex-1 border-0"
               allowFullScreen
               allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-              sandbox={
-                antiPopup
-                  ? "allow-scripts allow-same-origin allow-forms"
-                  : undefined
-              }
               title={playTarget.title}
               onLoad={() => setLoading(false)}
             />
@@ -225,13 +194,11 @@ export default function VideoPlayerModal({
             {/* Bottom Tip bar */}
             <div className="px-4 py-2.5 bg-[#0c0d13] border-t border-white/[0.06] flex flex-wrap items-center justify-between text-[11px] text-zinc-400 gap-2">
               <span className="flex items-center gap-1.5">
-                <span className={`w-2 h-2 rounded-full inline-block ${antiPopup ? "bg-emerald-400" : "bg-amber-400"}`} />
-                {antiPopup
-                  ? "Proteksi Anti-Iklan Aktif: Pop-up & tab baru otomatis diblokir oleh browser."
-                  : "Perhatian: Proteksi Anti-Iklan dinonaktifkan."}
+                <Sparkles className="w-3.5 h-3.5 text-red-500" />
+                Server Aktif: Putar video langsung dengan kontrol resolusi & subtitle.
               </span>
               <span className="text-zinc-500">
-                Jika video tidak berputar dengan anti-iklan, Anda dapat mematikannya lewat tombol perisai hijau di kanan atas.
+                Jika pemutar lambat di server ini, cukup klik tombol server lain di atas (Server 2 / Server 3).
               </span>
             </div>
 
